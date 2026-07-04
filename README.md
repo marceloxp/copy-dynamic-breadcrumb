@@ -1,31 +1,31 @@
 # Copy Dynamic Breadcrumb
 
-Extensão para o Visual Studio Code que copia para o clipboard o **breadcrumb dinâmico** do editor — o caminho do arquivo combinado com a hierarquia de símbolos na posição atual do cursor.
+A Visual Studio Code extension that copies the editor's **dynamic breadcrumb** to the clipboard — the file path combined with the symbol hierarchy at the current cursor position.
 
-Em vez de informar apenas o nome do arquivo, você cola um contexto preciso: **onde o arquivo está** e **em qual trecho do código o cursor está**. Isso é especialmente útil ao trabalhar com IA, porque reduz exploração desnecessária, economiza contexto e diminui a chance da ferramenta analisar a região errada do arquivo.
+Instead of sharing only a file name, you paste precise context: **where the file lives** and **which code region the cursor is in**. This is especially useful when working with AI tools, because it reduces unnecessary exploration, saves context, and lowers the chance of analyzing the wrong part of a file.
 
-## O que é copiado
+## What gets copied
 
-O breadcrumb reflete sempre o **editor ativo** e a **posição do cursor principal** (`selection.active`). Não há cache: cada execução recalcula o resultado com base no estado atual.
+The breadcrumb always reflects the **active editor** and the **primary cursor position** (`selection.active`). There is no cache: every run recalculates the result from the current state.
 
-O texto copiado segue o formato:
+Copied text uses this format:
 
 ```
 {file_path}:{code_path}
 ```
 
-| Parte       | Descrição                        | Separador |
-| ----------- | -------------------------------- | --------- |
-| `file_path` | Caminho do arquivo               | `/`       |
-| `code_path` | Hierarquia de símbolos no cursor | ` > `     |
+| Part        | Description                    | Separator |
+| ----------- | ------------------------------ | --------- |
+| `file_path` | File path                      | `/`       |
+| `code_path` | Symbol hierarchy at the cursor | ` > `     |
 
-Quando não há símbolos reconhecidos na posição do cursor, apenas o caminho do arquivo é copiado (sem `:`).
+When no symbols are recognized at the cursor position, only the file path is copied (no `:`).
 
-## Como usar
+## Usage
 
-### Menu de contexto do editor
+### Editor context menu
 
-Clique com o botão direito no editor e abra o submenu **Copy Dynamic Breadcrumb**:
+Right-click in the editor and open the **Copy Dynamic Breadcrumb** submenu:
 
 ```
 Copy Dynamic Breadcrumb  ▶
@@ -33,18 +33,18 @@ Copy Dynamic Breadcrumb  ▶
                           └── Absolute Path
 ```
 
-### Paleta de comandos
+### Command Palette
 
 - `Copy Dynamic Breadcrumb: Relative Path`
 - `Copy Dynamic Breadcrumb: Absolute Path`
 
-## Opções de cópia
+## Copy options
 
 ### Relative Path
 
-Usa o caminho do arquivo **relativo à pasta do workspace** que contém o arquivo (suporta workspaces com múltiplas raízes).
+Uses the file path **relative to the workspace folder** that contains the file (supports multi-root workspaces).
 
-**Exemplo:**
+**Example:**
 
 ```
 data/feeds/catalog.xml:rss > channel > item > customfields
@@ -52,39 +52,39 @@ data/feeds/catalog.xml:rss > channel > item > customfields
 
 ### Absolute Path
 
-Usa o **caminho absoluto** do arquivo no sistema.
+Uses the file's **absolute path** on the system.
 
-**Exemplo:**
+**Example:**
 
 ```
 /home/dev/projects/my-app/data/feeds/catalog.xml:rss > channel > item > customfields
 ```
 
-## Exemplos
+## Examples
 
-| Situação                             | Relative Path                                             | Absolute Path                                                                          |
-| ------------------------------------ | --------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Arquivo na raiz, sem símbolos        | `README.md`                                               | `/home/dev/projects/my-app/README.md`                                                  |
-| Arquivo em subpasta, sem símbolos    | `config/routes.php`                                       | `/home/dev/projects/my-app/config/routes.php`                                          |
-| Classe e método no cursor            | `src/Services/UserService.php:createUser > validateEmail` | `/home/dev/projects/my-app/src/Services/UserService.php:createUser > validateEmail`    |
-| XML com elementos aninhados          | `data/feeds/catalog.xml:rss > channel > item > comments`  | `/home/dev/projects/my-app/data/feeds/catalog.xml:rss > channel > item > comments`     |
-| Arquivo fora do workspace (relativo) | `draft.php`                                               | `/tmp/draft.php`                                                                       |
+| Scenario                         | Relative Path                                             | Absolute Path                                                                          |
+| -------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Root file, no symbols            | `README.md`                                               | `/home/dev/projects/my-app/README.md`                                                  |
+| Nested file, no symbols          | `config/routes.php`                                       | `/home/dev/projects/my-app/config/routes.php`                                          |
+| Class and method at cursor       | `src/Services/UserService.php:createUser > validateEmail` | `/home/dev/projects/my-app/src/Services/UserService.php:createUser > validateEmail`    |
+| Nested XML elements              | `data/feeds/catalog.xml:rss > channel > item > comments`  | `/home/dev/projects/my-app/data/feeds/catalog.xml:rss > channel > item > comments`     |
+| File outside workspace (relative) | `draft.php`                                               | `/tmp/draft.php`                                                                       |
 
-## Como funciona
+## How it works
 
-O VS Code não expõe uma API pública para ler o breadcrumb exibido na barra superior. A extensão o reconstrói usando apenas APIs públicas:
+VS Code does not expose a public API to read the breadcrumb shown in the editor title bar. This extension reconstructs it using public APIs only:
 
-1. **Caminho do arquivo** — relativo ao `WorkspaceFolder` ou absoluto via `Uri.fsPath`
-2. **Símbolos no cursor** — `DocumentSymbolProvider` (`vscode.executeDocumentSymbolProvider`)
+1. **File path** — relative to `WorkspaceFolder` or absolute via `Uri.fsPath`
+2. **Cursor symbols** — `DocumentSymbolProvider` (`vscode.executeDocumentSymbolProvider`)
 
-Funciona em qualquer linguagem que forneça símbolos de documento (TypeScript, PHP, XML, etc.), sem parsing específico por linguagem e independente do tema ou da UI do VS Code.
+It works for any language that provides document symbols (TypeScript, PHP, XML, etc.), without language-specific parsing and independent of theme or VS Code UI.
 
-## Requisitos
+## Requirements
 
 - Visual Studio Code `^1.125.0`
-- Windows, Linux ou macOS
+- Windows, Linux, or macOS
 
-## Desenvolvimento
+## Development
 
 ```bash
 npm install
@@ -92,8 +92,8 @@ npm run compile
 npm test
 ```
 
-Para testar localmente, abra o projeto no VS Code e pressione **F5** para iniciar o Extension Development Host.
+To test locally, open the project in VS Code and press **F5** to launch the Extension Development Host.
 
-## Licença
+## License
 
-Consulte o arquivo [LICENSE](LICENSE).
+See [LICENSE](LICENSE).

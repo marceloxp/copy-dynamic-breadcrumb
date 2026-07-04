@@ -1,21 +1,21 @@
 # Copy Dynamic Breadcrumb
 
-## Objetivo
+## Goal
 
-Criar uma extensão para o Visual Studio Code capaz de copiar para o clipboard o breadcrumb atualmente exibido na barra superior do editor.
+Build a Visual Studio Code extension that copies the breadcrumb currently shown in the editor title bar to the clipboard.
 
-Esta extensão também é útil como ferramenta auxiliar para IA. Ao invés de apenas informar o nome do arquivo, o programador pode colar o breadcrumb completo correspondente à posição atual do cursor, indicando exatamente onde a IA deve analisar. Com isso, a IA pode localizar diretamente o contexto desejado (arquivo, classe, método, elemento XML etc.), reduzindo ou eliminando a necessidade de explorar o arquivo para descobrir onde está o trecho relevante. Isso torna as interações mais rápidas, diminui o consumo de contexto e reduz a chance de a IA interpretar ou analisar uma região diferente da pretendida.
+This extension is also useful as an AI assistant tool. Instead of sharing only a file name, the developer can paste the full breadcrumb for the current cursor position, pointing exactly where the AI should focus. That lets the AI jump straight to the relevant context (file, class, method, XML element, etc.), reducing or eliminating the need to explore the file to find the right region. Interactions become faster, context usage drops, and the AI is less likely to analyze the wrong area.
 
-O breadcrumb deve refletir exatamente a posição atual do cursor no arquivo.
+The breadcrumb must reflect the exact current cursor position in the file.
 
-Exemplo:
+Example:
 
 ```
 .ai
 └── Jira
-    └── abertos
+    └── open
         └── VM-2973
-            └── cards-correlatos
+            └── related-cards
                 └── VM-2978.xml
                     └── rss
                         └── channel
@@ -23,133 +23,130 @@ Exemplo:
                                 └── comments
 ```
 
-Texto copiado:
+Copied text (relative path):
 
 ```
-.ai > Jira > abertos > VM-2973 > cards-correlatos > VM-2978.xml > rss > channel > item > comments
+data/feeds/catalog.xml:rss > channel > item > comments
 ```
 
 ---
 
-# Funcionalidades
+# Features
 
-## Comando
+## Commands
 
-Adicionar um comando chamado:
+Provide copy commands via a **Copy Dynamic Breadcrumb** submenu:
 
-```
-Copy Dynamic Breadcrumb
-```
+- **Relative Path** — workspace-relative file path
+- **Absolute Path** — absolute file path on disk
 
-Ao ser executado, o comando deve copiar para o clipboard o breadcrumb correspondente à posição atual do cursor.
+Both use the format `{file_path}:{code_path}`.
 
-Caso não exista editor ativo, exibir uma mensagem apropriada.
+When executed, the command copies the breadcrumb for the current cursor position to the clipboard.
 
----
-
-## Menu de contexto
-
-Adicionar o comando ao menu de contexto do editor.
-
-O comando deve estar disponível quando existir um editor de texto ativo.
+If there is no active editor, show an appropriate message.
 
 ---
 
-## Comportamento
+## Context menu
 
-O breadcrumb deve ser composto por:
+Add the submenu to the editor context menu.
 
-1. caminho relativo do arquivo dentro do workspace;
-2. símbolos que representam o contexto do cursor.
+It must be available when a text editor is active.
 
-Exemplo:
+---
+
+## Behavior
+
+The breadcrumb is composed of:
+
+1. the file path (relative or absolute, depending on the command);
+2. symbols that represent the cursor context.
+
+Examples:
 
 ```
-src > Services > UserService.php > createUser > validateEmail
+src/Services/UserService.php:createUser > validateEmail
 ```
-
-Outro exemplo:
 
 ```
 README.md
 ```
 
-Outro:
-
 ```
-config > routes.php
+config/routes.php
 ```
 
-Outro:
-
 ```
-feed.xml > rss > channel > item > comments
+data/feeds/catalog.xml:rss > channel > item > comments
 ```
 
 ---
 
-## Atualização
+## Freshness
 
-O comando sempre deve considerar:
+The command must always use:
 
-* arquivo atualmente ativo;
-* posição atual do cursor.
+* the currently active file;
+* the current cursor position.
 
-Mover o cursor deve alterar o breadcrumb que será copiado.
+Moving the cursor must change the copied breadcrumb.
 
-Não deve existir cache.
+There must be no cache.
 
 ---
 
 ## Clipboard
 
-O comando deve copiar apenas texto simples.
+The command copies plain text only.
 
-Não adicionar:
+Do not add:
 
-* aspas;
-* quebras de linha;
-* caracteres extras.
+* quotes;
+* line breaks;
+* extra characters.
 
-Formato:
+Format:
 
 ```
-segmento1 > segmento2 > segmento3 > segmento4
+{file_path}:{code_path}
+```
+
+Where `code_path` segments are joined with ` > `.
+
+---
+
+# Implementation
+
+Implementation is flexible, but must use only public Visual Studio Code APIs.
+
+If VS Code does not expose the breadcrumb directly, reconstruct it using:
+
+* file path (relative or absolute);
+* `DocumentSymbolProvider`;
+* current cursor position.
+
+The reconstruction should match the breadcrumb shown by VS Code.
+
+---
+
+# Edge cases
+
+## File outside the workspace
+
+For relative path, copy only the file name (or absolute path when that is the only option).
+
+Example:
+
+```
+draft.php
 ```
 
 ---
 
-# Implementação
+## No symbols
 
-A implementação fica livre, porém deve utilizar apenas APIs públicas do Visual Studio Code.
-
-Caso o VS Code não disponibilize diretamente o breadcrumb, a extensão deverá reconstruí-lo utilizando:
-
-* caminho relativo do arquivo;
-* DocumentSymbolProvider;
-* posição atual do cursor.
-
-A reconstrução deve produzir o mesmo resultado visual apresentado pelo Breadcrumb do VS Code.
-
----
-
-# Casos especiais
-
-## Arquivo fora do workspace
-
-Copiar somente o nome (ou caminho absoluto, caso seja a única informação disponível).
-
-Exemplo:
-
-```
-teste.php
-```
-
----
-
-## Sem símbolos
-
-Se o arquivo não possuir símbolos reconhecidos:
+If the file has no recognized symbols:
 
 ```
 README.md
@@ -157,51 +154,51 @@ README.md
 
 ---
 
-## Múltiplos cursores
+## Multiple cursors
 
-Utilizar apenas o cursor principal (`selection.active`).
-
----
-
-## Workspace com múltiplas pastas
-
-Utilizar o caminho relativo à pasta (`WorkspaceFolder`) que contém o arquivo.
+Use only the primary cursor (`selection.active`).
 
 ---
 
-## Símbolos aninhados
+## Multi-root workspace
 
-O breadcrumb deve incluir toda a hierarquia.
+For relative paths, use the path relative to the `WorkspaceFolder` that contains the file.
 
-Exemplo:
+---
 
-```
-Classe
- └── método
-      └── função local
-           └── variável
-```
+## Nested symbols
 
-Resultado:
+The breadcrumb must include the full hierarchy.
+
+Example:
 
 ```
-Classe > método > função local > variável
+Class
+ └── method
+      └── local function
+           └── variable
+```
+
+Result:
+
+```
+Class > method > local function > variable
 ```
 
 ---
 
-# Critérios de aceitação
+# Acceptance criteria
 
-* O texto copiado é idêntico ao breadcrumb apresentado pelo VS Code.
-* Funciona em qualquer linguagem que possua `DocumentSymbolProvider`.
-* Funciona independentemente do tema utilizado.
-* Não depende de parsing específico de nenhuma linguagem.
-* Não depende da UI do VS Code.
-* Funciona em Windows, Linux e macOS.
+* Copied text matches the VS Code breadcrumb for the cursor position.
+* Works for any language with a `DocumentSymbolProvider`.
+* Works regardless of theme.
+* Does not depend on language-specific parsing.
+* Does not depend on VS Code UI internals.
+* Works on Windows, Linux, and macOS.
 
 ---
 
-# Estrutura sugerida
+# Suggested structure
 
 ```
 extension.ts

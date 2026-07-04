@@ -60,30 +60,30 @@ suite('SymbolFinder', () => {
     });
     test('returns nested symbol hierarchy', () => {
         const symbols = [
-            createSymbol('Classe', 0, 30, [
-                createSymbol('metodo', 5, 20, [
-                    createSymbol('funcao local', 10, 15, [
-                        createSymbol('variavel', 12, 12),
+            createSymbol('Class', 0, 30, [
+                createSymbol('method', 5, 20, [
+                    createSymbol('local function', 10, 15, [
+                        createSymbol('variable', 12, 12),
                     ]),
                 ]),
             ]),
         ];
         const position = new vscode.Position(12, 2);
         assert.deepStrictEqual((0, SymbolFinder_1.findSymbolPath)(symbols, position), [
-            'Classe',
-            'metodo',
-            'funcao local',
-            'variavel',
+            'Class',
+            'method',
+            'local function',
+            'variable',
         ]);
     });
     test('returns shallowest matching symbol when cursor is not in a child', () => {
         const symbols = [
-            createSymbol('Classe', 0, 30, [
-                createSymbol('metodo', 5, 10),
+            createSymbol('Class', 0, 30, [
+                createSymbol('method', 5, 10),
             ]),
         ];
         const position = new vscode.Position(20, 0);
-        assert.deepStrictEqual((0, SymbolFinder_1.findSymbolPath)(symbols, position), ['Classe']);
+        assert.deepStrictEqual((0, SymbolFinder_1.findSymbolPath)(symbols, position), ['Class']);
     });
     test('returns empty array for empty symbols', () => {
         const position = new vscode.Position(0, 0);
