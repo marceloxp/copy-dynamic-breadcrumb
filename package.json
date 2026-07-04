@@ -9,15 +9,26 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:copy-dynamic-breadcrumb.copy"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "copy-dynamic-breadcrumb.helloWorld",
-        "title": "Hello World"
+        "command": "copy-dynamic-breadcrumb.copy",
+        "title": "Copy Dynamic Breadcrumb"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "copy-dynamic-breadcrumb.copy",
+          "when": "editorLangId",
+          "group": "navigation@100"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

@@ -33,10 +33,20 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-const assert = __importStar(require("assert"));
-suite('Extension Test Suite', () => {
-    test('placeholder', () => {
-        assert.ok(true);
-    });
-});
-//# sourceMappingURL=extension.test.js.map
+exports.BREADCRUMB_SEPARATOR = void 0;
+exports.buildBreadcrumb = buildBreadcrumb;
+const vscode = __importStar(require("vscode"));
+const filePathSegments_1 = require("../utils/filePathSegments");
+const SymbolFinder_1 = require("../utils/SymbolFinder");
+exports.BREADCRUMB_SEPARATOR = ' > ';
+async function buildBreadcrumb(editor) {
+    const { document, selection } = editor;
+    const uri = document.uri;
+    const position = selection.active;
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+    const fileSegments = (0, filePathSegments_1.getFilePathSegments)(uri, workspaceFolder ?? undefined);
+    const symbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', uri);
+    const symbolPath = (0, SymbolFinder_1.findSymbolPath)(symbols ?? [], position);
+    return [...fileSegments, ...symbolPath].join(exports.BREADCRUMB_SEPARATOR);
+}
+//# sourceMappingURL=BreadcrumbService.js.map

@@ -33,10 +33,16 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-const assert = __importStar(require("assert"));
-suite('Extension Test Suite', () => {
-    test('placeholder', () => {
-        assert.ok(true);
-    });
-});
-//# sourceMappingURL=extension.test.js.map
+exports.copyDynamicBreadcrumb = copyDynamicBreadcrumb;
+const vscode = __importStar(require("vscode"));
+const BreadcrumbService_1 = require("../services/BreadcrumbService");
+async function copyDynamicBreadcrumb() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        await vscode.window.showWarningMessage('No active text editor.');
+        return;
+    }
+    const breadcrumb = await (0, BreadcrumbService_1.buildBreadcrumb)(editor);
+    await vscode.env.clipboard.writeText(breadcrumb);
+}
+//# sourceMappingURL=copyDynamicBreadcrumb.js.map

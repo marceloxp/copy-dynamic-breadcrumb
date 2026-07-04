@@ -33,10 +33,13 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-const assert = __importStar(require("assert"));
-suite('Extension Test Suite', () => {
-    test('placeholder', () => {
-        assert.ok(true);
-    });
-});
-//# sourceMappingURL=extension.test.js.map
+exports.getFilePathSegments = getFilePathSegments;
+const path = __importStar(require("path"));
+function getFilePathSegments(uri, workspaceFolder) {
+    if (workspaceFolder) {
+        const relative = path.relative(workspaceFolder.uri.fsPath, uri.fsPath);
+        return relative.split(/[/\\]/).filter(Boolean);
+    }
+    return [path.basename(uri.fsPath)];
+}
+//# sourceMappingURL=filePathSegments.js.map
