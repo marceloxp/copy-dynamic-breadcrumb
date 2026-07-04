@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const assert = __importStar(require("assert"));
 const path = __importStar(require("path"));
 const vscode = __importStar(require("vscode"));
+const BreadcrumbService_1 = require("../services/BreadcrumbService");
 const filePathSegments_1 = require("../utils/filePathSegments");
 function createWorkspaceFolder(fsPath) {
     return {
@@ -70,17 +71,28 @@ suite('filePathSegments', () => {
     });
 });
 suite('BreadcrumbService formatting', () => {
-    test('joins file segments and symbols with separator', () => {
+    test('formats file path and symbols as file_path:code_path', () => {
+        const fileSegments = [
+            '.ai',
+            'Jira',
+            'abertos',
+            'VM-2973',
+            'cards-correlatos',
+            'VM-2978.xml',
+        ];
+        const symbolPath = ['rss', 'channel', 'item', 'comments'];
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(fileSegments, symbolPath), '.ai/Jira/abertos/VM-2973/cards-correlatos/VM-2978.xml:rss > channel > item > comments');
+    });
+    test('formats nested source file with symbol hierarchy', () => {
         const fileSegments = ['src', 'Services', 'UserService.php'];
         const symbolPath = ['createUser', 'validateEmail'];
-        const breadcrumb = [...fileSegments, ...symbolPath].join(' > ');
-        assert.strictEqual(breadcrumb, 'src > Services > UserService.php > createUser > validateEmail');
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(fileSegments, symbolPath), 'src/Services/UserService.php:createUser > validateEmail');
     });
-    test('returns filename only when there are no symbols', () => {
-        const fileSegments = ['README.md'];
-        const symbolPath = [];
-        const breadcrumb = [...fileSegments, ...symbolPath].join(' > ');
-        assert.strictEqual(breadcrumb, 'README.md');
+    test('returns file path only when there are no symbols', () => {
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(['README.md'], []), 'README.md');
+    });
+    test('returns nested file path only when there are no symbols', () => {
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(['config', 'routes.php'], []), 'config/routes.php');
     });
 });
 //# sourceMappingURL=filePathSegments.test.js.map

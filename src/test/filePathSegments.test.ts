@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { formatBreadcrumb } from '../services/BreadcrumbService';
 import { getFilePathSegments } from '../utils/filePathSegments';
 
 function createWorkspaceFolder(fsPath: string): vscode.WorkspaceFolder {
@@ -45,22 +46,38 @@ suite('filePathSegments', () => {
 });
 
 suite('BreadcrumbService formatting', () => {
-	test('joins file segments and symbols with separator', () => {
-		const fileSegments = ['src', 'Services', 'UserService.php'];
-		const symbolPath = ['createUser', 'validateEmail'];
-		const breadcrumb = [...fileSegments, ...symbolPath].join(' > ');
+	test('formats file path and symbols as file_path:code_path', () => {
+		const fileSegments = [
+			'.ai',
+			'Jira',
+			'abertos',
+			'VM-2973',
+			'cards-correlatos',
+			'VM-2978.xml',
+		];
+		const symbolPath = ['rss', 'channel', 'item', 'comments'];
 
 		assert.strictEqual(
-			breadcrumb,
-			'src > Services > UserService.php > createUser > validateEmail',
+			formatBreadcrumb(fileSegments, symbolPath),
+			'.ai/Jira/abertos/VM-2973/cards-correlatos/VM-2978.xml:rss > channel > item > comments',
 		);
 	});
 
-	test('returns filename only when there are no symbols', () => {
-		const fileSegments = ['README.md'];
-		const symbolPath: string[] = [];
-		const breadcrumb = [...fileSegments, ...symbolPath].join(' > ');
+	test('formats nested source file with symbol hierarchy', () => {
+		const fileSegments = ['src', 'Services', 'UserService.php'];
+		const symbolPath = ['createUser', 'validateEmail'];
 
-		assert.strictEqual(breadcrumb, 'README.md');
+		assert.strictEqual(
+			formatBreadcrumb(fileSegments, symbolPath),
+			'src/Services/UserService.php:createUser > validateEmail',
+		);
+	});
+
+	test('returns file path only when there are no symbols', () => {
+		assert.strictEqual(formatBreadcrumb(['README.md'], []), 'README.md');
+	});
+
+	test('returns nested file path only when there are no symbols', () => {
+		assert.strictEqual(formatBreadcrumb(['config', 'routes.php'], []), 'config/routes.php');
 	});
 });

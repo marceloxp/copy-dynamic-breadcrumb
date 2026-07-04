@@ -2,7 +2,16 @@ import * as vscode from 'vscode';
 import { getFilePathSegments } from '../utils/filePathSegments';
 import { findSymbolPath } from '../utils/SymbolFinder';
 
-export const BREADCRUMB_SEPARATOR = ' > ';
+export const SYMBOL_SEPARATOR = ' > ';
+
+export function formatBreadcrumb(fileSegments: string[], symbolPath: string[]): string {
+	const filePath = fileSegments.join('/');
+	if (symbolPath.length === 0) {
+		return filePath;
+	}
+
+	return `${filePath}:${symbolPath.join(SYMBOL_SEPARATOR)}`;
+}
 
 export async function buildBreadcrumb(editor: vscode.TextEditor): Promise<string> {
 	const { document, selection } = editor;
@@ -17,5 +26,5 @@ export async function buildBreadcrumb(editor: vscode.TextEditor): Promise<string
 	);
 	const symbolPath = findSymbolPath(symbols ?? [], position);
 
-	return [...fileSegments, ...symbolPath].join(BREADCRUMB_SEPARATOR);
+	return formatBreadcrumb(fileSegments, symbolPath);
 }
