@@ -34,6 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFilePathSegments = getFilePathSegments;
+exports.getFilePath = getFilePath;
 const path = __importStar(require("path"));
 function getFilePathSegments(uri, workspaceFolder) {
     if (workspaceFolder) {
@@ -41,5 +42,11 @@ function getFilePathSegments(uri, workspaceFolder) {
         return relative.split(/[/\\]/).filter(Boolean);
     }
     return [path.basename(uri.fsPath)];
+}
+function getFilePath(uri, pathStyle, workspaceFolder) {
+    if (pathStyle === 'absolute') {
+        return uri.fsPath;
+    }
+    return getFilePathSegments(uri, workspaceFolder).join('/');
 }
 //# sourceMappingURL=filePathSegments.js.map

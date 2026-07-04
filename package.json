@@ -10,22 +10,45 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:copy-dynamic-breadcrumb.copy"
+    "onCommand:copy-dynamic-breadcrumb.copyRelative",
+    "onCommand:copy-dynamic-breadcrumb.copyAbsolute"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "copy-dynamic-breadcrumb.copy",
-        "title": "Copy Dynamic Breadcrumb"
+        "command": "copy-dynamic-breadcrumb.copyRelative",
+        "title": "Relative Path",
+        "category": "Copy Dynamic Breadcrumb"
+      },
+      {
+        "command": "copy-dynamic-breadcrumb.copyAbsolute",
+        "title": "Absolute Path",
+        "category": "Copy Dynamic Breadcrumb"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "copy-dynamic-breadcrumb.submenu",
+        "label": "Copy Dynamic Breadcrumb"
       }
     ],
     "menus": {
       "editor/context": [
         {
-          "command": "copy-dynamic-breadcrumb.copy",
+          "submenu": "copy-dynamic-breadcrumb.submenu",
           "when": "editorLangId",
           "group": "navigation@100"
+        }
+      ],
+      "copy-dynamic-breadcrumb.submenu": [
+        {
+          "command": "copy-dynamic-breadcrumb.copyRelative",
+          "group": "1_copy@1"
+        },
+        {
+          "command": "copy-dynamic-breadcrumb.copyAbsolute",
+          "group": "1_copy@2"
         }
       ]
     }

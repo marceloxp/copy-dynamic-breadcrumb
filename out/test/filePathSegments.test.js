@@ -69,30 +69,42 @@ suite('filePathSegments', () => {
             'UserService.php',
         ]);
     });
+    test('returns slash-separated relative file path', () => {
+        const workspace = createWorkspaceFolder('/home/xp/projects');
+        const uri = vscode.Uri.file('/home/xp/projects/.ai/Jira/abertos/VM-2973/VM-2973.xml');
+        assert.strictEqual((0, filePathSegments_1.getFilePath)(uri, 'relative', workspace), '.ai/Jira/abertos/VM-2973/VM-2973.xml');
+    });
+    test('returns absolute file path', () => {
+        const workspace = createWorkspaceFolder('/home/xp/projects');
+        const uri = vscode.Uri.file('/home/xp/projects/.ai/Jira/abertos/VM-2973/VM-2973.xml');
+        assert.strictEqual((0, filePathSegments_1.getFilePath)(uri, 'absolute', workspace), '/home/xp/projects/.ai/Jira/abertos/VM-2973/VM-2973.xml');
+    });
+    test('returns absolute file path even when outside workspace', () => {
+        const uri = vscode.Uri.file('/tmp/teste.php');
+        assert.strictEqual((0, filePathSegments_1.getFilePath)(uri, 'absolute'), '/tmp/teste.php');
+    });
 });
 suite('BreadcrumbService formatting', () => {
-    test('formats file path and symbols as file_path:code_path', () => {
-        const fileSegments = [
-            '.ai',
-            'Jira',
-            'abertos',
-            'VM-2973',
-            'cards-correlatos',
-            'VM-2978.xml',
-        ];
+    test('formats relative file path and symbols as file_path:code_path', () => {
+        const filePath = '.ai/Jira/abertos/VM-2973/cards-correlatos/VM-2978.xml';
         const symbolPath = ['rss', 'channel', 'item', 'comments'];
-        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(fileSegments, symbolPath), '.ai/Jira/abertos/VM-2973/cards-correlatos/VM-2978.xml:rss > channel > item > comments');
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(filePath, symbolPath), '.ai/Jira/abertos/VM-2973/cards-correlatos/VM-2978.xml:rss > channel > item > comments');
+    });
+    test('formats absolute file path and symbols as file_path:code_path', () => {
+        const filePath = '/home/xp/projects/.ai/Jira/abertos/VM-2973/VM-2973.xml';
+        const symbolPath = ['rss', 'channel', 'item', 'customfields'];
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(filePath, symbolPath), '/home/xp/projects/.ai/Jira/abertos/VM-2973/VM-2973.xml:rss > channel > item > customfields');
     });
     test('formats nested source file with symbol hierarchy', () => {
-        const fileSegments = ['src', 'Services', 'UserService.php'];
+        const filePath = 'src/Services/UserService.php';
         const symbolPath = ['createUser', 'validateEmail'];
-        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(fileSegments, symbolPath), 'src/Services/UserService.php:createUser > validateEmail');
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(filePath, symbolPath), 'src/Services/UserService.php:createUser > validateEmail');
     });
     test('returns file path only when there are no symbols', () => {
-        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(['README.md'], []), 'README.md');
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)('README.md', []), 'README.md');
     });
     test('returns nested file path only when there are no symbols', () => {
-        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)(['config', 'routes.php'], []), 'config/routes.php');
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumb)('config/routes.php', []), 'config/routes.php');
     });
 });
 //# sourceMappingURL=filePathSegments.test.js.map

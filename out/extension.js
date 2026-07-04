@@ -38,8 +38,13 @@ exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const copyDynamicBreadcrumb_1 = require("./commands/copyDynamicBreadcrumb");
 function activate(context) {
-    const disposable = vscode.commands.registerCommand('copy-dynamic-breadcrumb.copy', copyDynamicBreadcrumb_1.copyDynamicBreadcrumb);
-    context.subscriptions.push(disposable);
+    const commands = [
+        ['copy-dynamic-breadcrumb.copyRelative', 'relative'],
+        ['copy-dynamic-breadcrumb.copyAbsolute', 'absolute'],
+    ];
+    for (const [commandId, pathStyle] of commands) {
+        context.subscriptions.push(vscode.commands.registerCommand(commandId, () => (0, copyDynamicBreadcrumb_1.copyDynamicBreadcrumb)(pathStyle)));
+    }
 }
 function deactivate() { }
 //# sourceMappingURL=extension.js.map

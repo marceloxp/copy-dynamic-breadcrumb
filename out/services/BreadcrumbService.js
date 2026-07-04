@@ -40,21 +40,20 @@ const vscode = __importStar(require("vscode"));
 const filePathSegments_1 = require("../utils/filePathSegments");
 const SymbolFinder_1 = require("../utils/SymbolFinder");
 exports.SYMBOL_SEPARATOR = ' > ';
-function formatBreadcrumb(fileSegments, symbolPath) {
-    const filePath = fileSegments.join('/');
+function formatBreadcrumb(filePath, symbolPath) {
     if (symbolPath.length === 0) {
         return filePath;
     }
     return `${filePath}:${symbolPath.join(exports.SYMBOL_SEPARATOR)}`;
 }
-async function buildBreadcrumb(editor) {
+async function buildBreadcrumb(editor, pathStyle) {
     const { document, selection } = editor;
     const uri = document.uri;
     const position = selection.active;
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-    const fileSegments = (0, filePathSegments_1.getFilePathSegments)(uri, workspaceFolder ?? undefined);
+    const filePath = (0, filePathSegments_1.getFilePath)(uri, pathStyle, workspaceFolder ?? undefined);
     const symbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', uri);
     const symbolPath = (0, SymbolFinder_1.findSymbolPath)(symbols ?? [], position);
-    return formatBreadcrumb(fileSegments, symbolPath);
+    return formatBreadcrumb(filePath, symbolPath);
 }
 //# sourceMappingURL=BreadcrumbService.js.map
