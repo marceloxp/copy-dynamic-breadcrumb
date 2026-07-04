@@ -2,16 +2,14 @@
   "name": "copy-dynamic-breadcrumb",
   "displayName": "Copy Dynamic Breadcrumb",
   "description": "Copy the current editor breadcrumb to the clipboard.",
+  "publisher": "marceloxp",
+  "license": "SEE LICENSE IN LICENSE",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.125.0"
   },
   "categories": [
     "Other"
-  ],
-  "activationEvents": [
-    "onCommand:copy-dynamic-breadcrumb.copyRelative",
-    "onCommand:copy-dynamic-breadcrumb.copyAbsolute"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -74,5 +72,13 @@
   "overrides": {
     "diff": "^8.0.4",
     "serialize-javascript": "^7.0.6"
-  }
+  },
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/marceloxp/copy-dynamic-breadcrumb.git"
+    },
+    "bugs": {
+        "url": "https://github.com/marceloxp/copy-dynamic-breadcrumb/issues"
+    },
+    "homepage": "https://github.com/marceloxp/copy-dynamic-breadcrumb#readme"
 }
