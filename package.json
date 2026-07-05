@@ -24,6 +24,16 @@
         "command": "copy-dynamic-breadcrumb.copyAbsolute",
         "title": "Absolute Path",
         "category": "Copy Dynamic Breadcrumb"
+      },
+      {
+        "command": "copy-dynamic-breadcrumb.copyJsonRelative",
+        "title": "JSON Relative Path",
+        "category": "Copy Dynamic Breadcrumb"
+      },
+      {
+        "command": "copy-dynamic-breadcrumb.copyJsonAbsolute",
+        "title": "JSON Absolute Path",
+        "category": "Copy Dynamic Breadcrumb"
       }
     ],
     "submenus": [
@@ -48,6 +58,14 @@
         {
           "command": "copy-dynamic-breadcrumb.copyAbsolute",
           "group": "1_copy@2"
+        },
+        {
+          "command": "copy-dynamic-breadcrumb.copyJsonRelative",
+          "group": "2_json@1"
+        },
+        {
+          "command": "copy-dynamic-breadcrumb.copyJsonAbsolute",
+          "group": "2_json@2"
         }
       ]
     }

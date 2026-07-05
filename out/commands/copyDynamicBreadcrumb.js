@@ -34,6 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.copyDynamicBreadcrumb = copyDynamicBreadcrumb;
+exports.copyDynamicBreadcrumbJson = copyDynamicBreadcrumbJson;
 const vscode = __importStar(require("vscode"));
 const BreadcrumbService_1 = require("../services/BreadcrumbService");
 async function copyDynamicBreadcrumb(pathStyle) {
@@ -43,6 +44,15 @@ async function copyDynamicBreadcrumb(pathStyle) {
         return;
     }
     const breadcrumb = await (0, BreadcrumbService_1.buildBreadcrumb)(editor, pathStyle);
+    await vscode.env.clipboard.writeText(breadcrumb);
+}
+async function copyDynamicBreadcrumbJson(pathStyle) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        await vscode.window.showWarningMessage('No active text editor.');
+        return;
+    }
+    const breadcrumb = await (0, BreadcrumbService_1.buildBreadcrumbJson)(editor, pathStyle);
     await vscode.env.clipboard.writeText(breadcrumb);
 }
 //# sourceMappingURL=copyDynamicBreadcrumb.js.map

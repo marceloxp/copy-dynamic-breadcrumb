@@ -36,6 +36,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SYMBOL_SEPARATOR = void 0;
 exports.formatBreadcrumb = formatBreadcrumb;
 exports.buildBreadcrumb = buildBreadcrumb;
+exports.formatBreadcrumbJson = formatBreadcrumbJson;
+exports.buildBreadcrumbJson = buildBreadcrumbJson;
 const vscode = __importStar(require("vscode"));
 const filePathSegments_1 = require("../utils/filePathSegments");
 const SymbolFinder_1 = require("../utils/SymbolFinder");
@@ -55,5 +57,20 @@ async function buildBreadcrumb(editor, pathStyle) {
     const symbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', uri);
     const symbolPath = (0, SymbolFinder_1.findSymbolPath)(symbols ?? [], position);
     return formatBreadcrumb(filePath, symbolPath);
+}
+function formatBreadcrumbJson(filePath, symbolPath, line) {
+    const codePath = `[${symbolPath.map((segment) => JSON.stringify(segment)).join(', ')}]`;
+    return `{ "file_path": ${JSON.stringify(filePath)}, "code_path": ${codePath}, "line": ${line} }`;
+}
+async function buildBreadcrumbJson(editor, pathStyle) {
+    const { document, selection } = editor;
+    const uri = document.uri;
+    const position = selection.active;
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+    const filePath = (0, filePathSegments_1.getFilePath)(uri, pathStyle, workspaceFolder ?? undefined);
+    const symbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', uri);
+    const symbolPath = (0, SymbolFinder_1.findSymbolPath)(symbols ?? [], position);
+    const line = position.line + 1;
+    return formatBreadcrumbJson(filePath, symbolPath, line);
 }
 //# sourceMappingURL=BreadcrumbService.js.map

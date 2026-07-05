@@ -30,3 +30,32 @@ export async function buildBreadcrumb(
 
 	return formatBreadcrumb(filePath, symbolPath);
 }
+
+export function formatBreadcrumbJson(
+	filePath: string,
+	symbolPath: string[],
+	line: number,
+): string {
+	const codePath = `[${symbolPath.map((segment) => JSON.stringify(segment)).join(', ')}]`;
+	return `{ "file_path": ${JSON.stringify(filePath)}, "code_path": ${codePath}, "line": ${line} }`;
+}
+
+export async function buildBreadcrumbJson(
+	editor: vscode.TextEditor,
+	pathStyle: PathStyle,
+): Promise<string> {
+	const { document, selection } = editor;
+	const uri = document.uri;
+	const position = selection.active;
+	const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
+	const filePath = getFilePath(uri, pathStyle, workspaceFolder ?? undefined);
+
+	const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>(
+		'vscode.executeDocumentSymbolProvider',
+		uri,
+	);
+	const symbolPath = findSymbolPath(symbols ?? [], position);
+	const line = position.line + 1;
+
+	return formatBreadcrumbJson(filePath, symbolPath, line);
+}
