@@ -1,6 +1,6 @@
 # Copy Dynamic Breadcrumb
 
-![banner](https://github.com/marceloxp/copy-dynamic-breadcrumb/raw/main/images/banner.png)
+![banner](https://github.com/marceloxp/copy-dynamic-breadcrumb/raw/main/images/banner-v2.png)
 
 A Visual Studio Code extension that copies the editor's **dynamic breadcrumb** to the clipboard — the file path combined with the symbol hierarchy at the current cursor position.
 
