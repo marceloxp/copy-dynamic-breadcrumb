@@ -5,7 +5,7 @@
   "publisher": "marceloxp",
   "icon": "images/icon.png",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.125.0"
   },
@@ -92,12 +92,12 @@
     "diff": "^8.0.4",
     "serialize-javascript": "^7.0.6"
   },
-      "repository": {
-        "type": "git",
-        "url": "https://github.com/marceloxp/copy-dynamic-breadcrumb.git"
-    },
-    "bugs": {
-        "url": "https://github.com/marceloxp/copy-dynamic-breadcrumb/issues"
-    },
-    "homepage": "https://github.com/marceloxp/copy-dynamic-breadcrumb#readme"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marceloxp/copy-dynamic-breadcrumb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marceloxp/copy-dynamic-breadcrumb/issues"
+  },
+  "homepage": "https://github.com/marceloxp/copy-dynamic-breadcrumb#readme"
 }
