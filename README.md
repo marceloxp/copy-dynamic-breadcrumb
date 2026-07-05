@@ -1,5 +1,7 @@
 # Copy Dynamic Breadcrumb
 
+![banner](https://github.com/marceloxp/copy-dynamic-breadcrumb/raw/master/images/banner.png)
+
 A Visual Studio Code extension that copies the editor's **dynamic breadcrumb** to the clipboard — the file path combined with the symbol hierarchy at the current cursor position.
 
 Instead of sharing only a file name, you paste precise context: **where the file lives** and **which code region the cursor is in**. This is especially useful when working with AI tools, because it reduces unnecessary exploration, saves context, and lowers the chance of analyzing the wrong part of a file.
