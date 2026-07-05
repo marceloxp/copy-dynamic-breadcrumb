@@ -3,6 +3,7 @@
   "displayName": "Copy Dynamic Breadcrumb",
   "description": "Copy the current editor breadcrumb to the clipboard.",
   "publisher": "marceloxp",
+  "icon": "images/icon.png",
   "license": "SEE LICENSE IN LICENSE",
   "version": "0.0.1",
   "engines": {
