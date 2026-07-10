@@ -37,6 +37,7 @@ exports.SYMBOL_SEPARATOR = void 0;
 exports.formatBreadcrumb = formatBreadcrumb;
 exports.buildBreadcrumb = buildBreadcrumb;
 exports.formatBreadcrumbJson = formatBreadcrumbJson;
+exports.formatBreadcrumbJsonSelection = formatBreadcrumbJsonSelection;
 exports.buildBreadcrumbJson = buildBreadcrumbJson;
 const vscode = __importStar(require("vscode"));
 const filePathSegments_1 = require("../utils/filePathSegments");
@@ -58,19 +59,34 @@ async function buildBreadcrumb(editor, pathStyle) {
     const symbolPath = (0, SymbolFinder_1.findSymbolPath)(symbols ?? [], position);
     return formatBreadcrumb(filePath, symbolPath);
 }
+function formatCodePath(symbolPath) {
+    return `[${symbolPath.map((segment) => JSON.stringify(segment)).join(', ')}]`;
+}
 function formatBreadcrumbJson(filePath, symbolPath, line) {
-    const codePath = `[${symbolPath.map((segment) => JSON.stringify(segment)).join(', ')}]`;
+    const codePath = formatCodePath(symbolPath);
     return `{ "file_path": ${JSON.stringify(filePath)}, "code_path": ${codePath}, "line": ${line} }`;
+}
+function formatBreadcrumbJsonSelection(filePath, symbolPath, startLine, endLine) {
+    const codePath = formatCodePath(symbolPath);
+    return `{ "file_path": ${JSON.stringify(filePath)}, "code_path": ${codePath}, "selection": { "start_line": ${startLine}, "end_line": ${endLine} } }`;
+}
+function topOfSelection(selection) {
+    return selection.start.line <= selection.end.line ? selection.start : selection.end;
 }
 async function buildBreadcrumbJson(editor, pathStyle) {
     const { document, selection } = editor;
     const uri = document.uri;
-    const position = selection.active;
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
     const filePath = (0, filePathSegments_1.getFilePath)(uri, pathStyle, workspaceFolder ?? undefined);
     const symbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', uri);
-    const symbolPath = (0, SymbolFinder_1.findSymbolPath)(symbols ?? [], position);
-    const line = position.line + 1;
+    const symbolPosition = selection.isEmpty ? selection.active : topOfSelection(selection);
+    const symbolPath = (0, SymbolFinder_1.findSymbolPath)(symbols ?? [], symbolPosition);
+    if (selection.start.line !== selection.end.line) {
+        const startLine = Math.min(selection.start.line, selection.end.line) + 1;
+        const endLine = Math.max(selection.start.line, selection.end.line) + 1;
+        return formatBreadcrumbJsonSelection(filePath, symbolPath, startLine, endLine);
+    }
+    const line = selection.active.line + 1;
     return formatBreadcrumbJson(filePath, symbolPath, line);
 }
 //# sourceMappingURL=BreadcrumbService.js.map

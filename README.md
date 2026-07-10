@@ -8,7 +8,9 @@ Instead of sharing only a file name, you paste precise context: **where the file
 
 ## What gets copied
 
-The breadcrumb always reflects the **active editor** and the **primary cursor position** (`selection.active`). There is no cache: every run recalculates the result from the current state.
+The breadcrumb always reflects the **active editor** and the current **selection**. There is no cache: every run recalculates the result from the current state.
+
+For the text format and for JSON with a single-line selection (cursor or partial line), the **primary cursor position** (`selection.active`) drives symbol lookup. When **more than one line** is selected and you copy in JSON format, the output uses a `selection` range instead of a single `line`.
 
 Two output formats are available:
 
@@ -29,19 +31,30 @@ When no symbols are recognized at the cursor position, only the file path is cop
 
 ### JSON format
 
-Copied by **JSON Relative Path** and **JSON Absolute Path**:
+Copied by **JSON Relative Path** and **JSON Absolute Path**.
+
+**Single line** (cursor or selection on one line) — includes `line`:
 
 ```json
 { "file_path": "packages/actions/src/Action.php", "code_path": ["Action", "getSchemaComponentState"], "line": 605 }
 ```
 
-| Field       | Description                                      |
-| ----------- | ------------------------------------------------ |
-| `file_path` | File path (relative or absolute, per menu item)  |
-| `code_path` | Symbol hierarchy at the cursor, as a JSON array  |
-| `line`      | 1-based line number of the cursor                |
+**Multiple lines selected** — includes `selection` instead of `line`:
 
-When no symbols are recognized at the cursor position, `code_path` is an empty array (`[]`).
+```json
+{ "file_path": "/home/dev/projects/filament/packages/actions/src/ImportAction.php", "code_path": ["ImportAction"], "selection": { "start_line": 528, "end_line": 533 } }
+```
+
+That JSON points an AI (or a human) straight at the `maxRows` method — no need to open the file and hunt for it.
+
+| Field        | Description                                                                 |
+| ------------ | --------------------------------------------------------------------------- |
+| `file_path`  | File path (relative or absolute, per menu item)                             |
+| `code_path`  | Symbol hierarchy at the cursor or at the top of the selection, as an array  |
+| `line`       | 1-based line number of the cursor (single-line selection only)              |
+| `selection`  | 1-based `start_line` and `end_line` of the selected range (multi-line only) |
+
+When no symbols are recognized, `code_path` is an empty array (`[]`). For multi-line selections, `start_line` is always ≤ `end_line`, even when the user selects bottom-up.
 
 ## Usage
 
@@ -91,24 +104,23 @@ Uses the file's **absolute path** on the system.
 
 ### JSON
 
-#### JSON Relative Path
+#### JSON Relative Path / JSON Absolute Path
 
-Uses a **relative** `file_path` and includes `code_path` as a symbol array plus the cursor line.
+Uses `file_path` (relative or absolute) and `code_path` as a symbol array. The location field depends on the selection:
 
-**Example:**
+- **One line** — `line` with the cursor's 1-based line number.
+- **Multiple lines** — `selection` with `start_line` and `end_line` (1-based, inclusive).
+
+**Single-line example:**
 
 ```json
 { "file_path": "packages/actions/src/Action.php", "code_path": ["Action", "getSchemaComponentState"], "line": 605 }
 ```
 
-#### JSON Absolute Path
-
-Uses an **absolute** `file_path` with the same JSON structure.
-
-**Example:**
+**Multi-line example:**
 
 ```json
-{ "file_path": "/home/dev/projects/my-app/data/feeds/catalog.xml", "code_path": ["rss", "channel", "item", "customfields"], "line": 125 }
+{ "file_path": "/home/dev/projects/filament/packages/actions/src/ImportAction.php", "code_path": ["ImportAction"], "selection": { "start_line": 528, "end_line": 533 } }
 ```
 
 ## Examples
@@ -125,11 +137,12 @@ Uses an **absolute** `file_path` with the same JSON structure.
 
 ### JSON format
 
-| Scenario                   | JSON Relative Path                                                                                                      | JSON Absolute Path                                                                                                                                           |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Root file, no symbols      | `{ "file_path": "README.md", "code_path": [], "line": 1 }`                                                              | `{ "file_path": "/home/dev/projects/my-app/README.md", "code_path": [], "line": 1 }`                                                                         |
-| Class and method at cursor | `{ "file_path": "packages/actions/src/Action.php", "code_path": ["Action", "getSchemaComponentState"], "line": 605 }` | `{ "file_path": "/home/dev/projects/my-app/packages/actions/src/Action.php", "code_path": ["Action", "getSchemaComponentState"], "line": 605 }`              |
-| Nested XML elements        | `{ "file_path": "data/feeds/catalog.xml", "code_path": ["rss", "channel", "item", "comments"], "line": 42 }`          | `{ "file_path": "/home/dev/projects/my-app/data/feeds/catalog.xml", "code_path": ["rss", "channel", "item", "comments"], "line": 42 }`                     |
+| Scenario                           | JSON Relative Path                                                                                                                             | JSON Absolute Path                                                                                                                                                         |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Root file, no symbols              | `{ "file_path": "README.md", "code_path": [], "line": 1 }`                                                                                     | `{ "file_path": "/home/dev/projects/my-app/README.md", "code_path": [], "line": 1 }`                                                                                       |
+| Class and method at cursor         | `{ "file_path": "packages/actions/src/Action.php", "code_path": ["Action", "getSchemaComponentState"], "line": 605 }`                          | `{ "file_path": "/home/dev/projects/my-app/packages/actions/src/Action.php", "code_path": ["Action", "getSchemaComponentState"], "line": 605 }`                            |
+| Nested XML elements                | `{ "file_path": "data/feeds/catalog.xml", "code_path": ["rss", "channel", "item", "comments"], "line": 42 }`                                   | `{ "file_path": "/home/dev/projects/my-app/data/feeds/catalog.xml", "code_path": ["rss", "channel", "item", "comments"], "line": 42 }`                                     |
+| Multi-line selection (e.g. method) | `{ "file_path": "packages/actions/src/ImportAction.php", "code_path": ["ImportAction"], "selection": { "start_line": 528, "end_line": 533 } }` | `{ "file_path": "/home/dev/projects/filament/packages/actions/src/ImportAction.php", "code_path": ["ImportAction"], "selection": { "start_line": 528, "end_line": 533 } }` |
 
 ## How it works
 
@@ -137,7 +150,7 @@ VS Code does not expose a public API to read the breadcrumb shown in the editor 
 
 1. **File path** — relative to `WorkspaceFolder` or absolute via `Uri.fsPath`
 2. **Cursor symbols** — `DocumentSymbolProvider` (`vscode.executeDocumentSymbolProvider`)
-3. **Line number** — `selection.active.line + 1` (JSON format only)
+3. **Location (JSON only)** — `line` from `selection.active` when the selection spans one line; `selection.start_line` / `selection.end_line` (1-based) when it spans multiple lines. Symbol lookup uses the cursor for single-line selections and the top of the range for multi-line selections.
 
 It works for any language that provides document symbols (TypeScript, PHP, XML, etc.), without language-specific parsing and independent of theme or VS Code UI.
 

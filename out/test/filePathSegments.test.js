@@ -124,5 +124,13 @@ suite('BreadcrumbService JSON formatting', () => {
     test('escapes quotes in symbol names', () => {
         assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumbJson)('src/foo.ts', ['method "test"'], 10), '{ "file_path": "src/foo.ts", "code_path": ["method \\"test\\""], "line": 10 }');
     });
+    test('formats multi-line selection with start_line and end_line', () => {
+        const filePath = 'CLAUDE.md';
+        const symbolPath = [
+            '# fact-factory — Usage doctrine for AI agents',
+            '## The golden rule',
+        ];
+        assert.strictEqual((0, BreadcrumbService_1.formatBreadcrumbJsonSelection)(filePath, symbolPath, 14, 28), '{ "file_path": "CLAUDE.md", "code_path": ["# fact-factory — Usage doctrine for AI agents", "## The golden rule"], "selection": { "start_line": 14, "end_line": 28 } }');
+    });
 });
 //# sourceMappingURL=filePathSegments.test.js.map

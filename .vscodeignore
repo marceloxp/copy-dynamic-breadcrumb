@@ -1,5 +1,7 @@
 .vscode/**
 .vscode-test/**
+.cursor/**
+.fact-factory/**
 src/**
 .gitignore
 .yarnrc

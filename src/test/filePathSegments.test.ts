@@ -1,7 +1,11 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { formatBreadcrumb, formatBreadcrumbJson } from '../services/BreadcrumbService';
+import {
+	formatBreadcrumb,
+	formatBreadcrumbJson,
+	formatBreadcrumbJsonSelection,
+} from '../services/BreadcrumbService';
 import { getFilePath, getFilePathSegments } from '../utils/filePathSegments';
 
 function createWorkspaceFolder(fsPath: string): vscode.WorkspaceFolder {
@@ -143,6 +147,19 @@ suite('BreadcrumbService JSON formatting', () => {
 		assert.strictEqual(
 			formatBreadcrumbJson('src/foo.ts', ['method "test"'], 10),
 			'{ "file_path": "src/foo.ts", "code_path": ["method \\"test\\""], "line": 10 }',
+		);
+	});
+
+	test('formats multi-line selection with start_line and end_line', () => {
+		const filePath = 'CLAUDE.md';
+		const symbolPath = [
+			'# fact-factory — Usage doctrine for AI agents',
+			'## The golden rule',
+		];
+
+		assert.strictEqual(
+			formatBreadcrumbJsonSelection(filePath, symbolPath, 14, 28),
+			'{ "file_path": "CLAUDE.md", "code_path": ["# fact-factory — Usage doctrine for AI agents", "## The golden rule"], "selection": { "start_line": 14, "end_line": 28 } }',
 		);
 	});
 });
